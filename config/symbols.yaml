@@ -1,0 +1,7 @@
+symbols:
+  - internal: HK.00700
+    futu: HK.00700
+    ib_symbol: '700'
+    ib_exchange: SEHK
+    ib_currency: HKD
+    market: HK
