@@ -97,6 +97,7 @@ Position : symbol, base_qty, t_position, avg_cost   # 实际持仓 = base_qty + 
 | `SymbolMap` | 富途 `HK.00700`/`US.AAPL` ↔ IB `700 SEHK`/`AAPL SMART` | 配置表 |
 | `StateStore` | T仓状态持久化(Redis),重启从 IB 持仓重建 | redis |
 | `EventBus` | Redis pub/sub + stream 封装 | redis |
+| `Scanner`(回测期工具) | 输入用户候选池 → 做T适配性评分排名 → 选 top≤3 + 标定参数 | backtest 引擎、DataFeed |
 
 复用点:换券商只写新 `Broker` 适配器;换数据源只写新 `DataFeed`;策略全部纯函数,可单独回测和复用。
 
@@ -173,6 +174,19 @@ t_position : 当前T偏移,范围 [-t_pool, +t_pool],初始 0
 - 标定:布林周期/σ、RSI 阈值、t_ratio、网格 N、熔断阈值 —— **港股 / 美股分别标定**(波动不同),输出每只标一套 yaml 参数。
 - 增量自录:data 进程把实时 bar 落 parquet/库,边跑边攒自有数据集,回测/实盘对账双用,不占富途额度。
 
+### 8.1 标的筛选(Scanner)
+
+回测**不选底仓**(底仓是你的投资/基本面决策),但从你给的**候选池(10-30只)**筛出适合做T的 top≤3,并标参。**不扫全市场**(富途额度按只发放,会爆)。
+
+| 适配性指标 | 选什么 | 原因 |
+|------|--------|------|
+| 日内振幅 ATR% / (H-L)/C | 高 | 振幅大才有肉 |
+| 均值回归性 Hurst<0.5 / 日内自相关 | 强回归 | 日内震荡非单边 |
+| 流动性 日均额 / 买卖价差 | 高、价差小 | 易成交、滑点小 |
+| 策略回测 夏普/胜率/做T增收 | 高 | 实测适配 |
+
+输出:候选池跑分排名 + 每市场 top≤3 + 每只 yaml 参数。
+
 ## 9. 错误处理 / 容灾
 
 - 双网关健康检查 + 自动重连(OpenD、IB Gateway)。
@@ -212,6 +226,7 @@ trading/
   risk/          # RiskManager
   clock/         # MarketClock
   backtest/      # 回测引擎、参数标定脚本
+  scanner/       # 候选池做T适配性筛选
   apps/
     data.py      # data 进程入口
     trader.py    # trader 进程入口
@@ -224,7 +239,7 @@ trading/
 
 1. **数据管道验证(现可做)**:富途 OpenD 连通、`get_history_kl_quota` 查额度、拉一只港股 8 年 1 分钟、实时订阅验证缺口/时区。
 2. **核心模块 + 单测**:数据模型、端口、FutuDataFeed、IBBroker、策略、网格、风控,全部单元测试。
-3. **回测 + 参数标定**:港美股分别标定,产出 yaml。
+3. **筛选 + 回测 + 参数标定**:你给候选池 → Scanner 筛 top≤3 → 港美股分别标定,产出 yaml。
 4. **集成 + IB paper**:三进程 + Redis 跑通,paper account 验证全链路。
 5. **实盘灰度**:1 只极小仓 → 逐步放大。
 
@@ -232,5 +247,5 @@ trading/
 
 - 假设每市场 ≤3 只,任意时刻并发 ≤3(单市场开盘)。
 - 假设富途账户行情权限覆盖目标港美股 1 分钟实时(实施前 §13.1 验证)。
-- 具体标的清单待定(进入实现前提供)。
+- 候选池(10-30只)由你提供,Scanner 筛出每市场 top≤3 做T标。
 - 做T方向默认双向;若资金紧可切只反T。
