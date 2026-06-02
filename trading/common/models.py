@@ -38,3 +38,33 @@ class Bar:
             open=d["open"], high=d["high"], low=d["low"],
             close=d["close"], volume=d["volume"], turnover=d["turnover"],
         )
+
+
+class Side(str, Enum):
+    BUY = "BUY"
+    SELL = "SELL"
+
+
+class OrderType(str, Enum):
+    LMT = "LMT"
+    MKT = "MKT"
+
+
+@dataclass(frozen=True)
+class Order:
+    symbol: str                     # 内部代码
+    side: Side
+    qty: float
+    order_type: OrderType
+    limit_price: float | None = None
+    client_id: str = ""
+
+
+@dataclass(frozen=True)
+class Fill:
+    symbol: str
+    side: Side
+    qty: float
+    price: float
+    ts: datetime
+    order_id: str
