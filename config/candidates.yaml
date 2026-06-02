@@ -1,0 +1,11 @@
+# 你看好/愿做底仓的票,每市场可多只,Scanner 筛 top
+start: "2024-06-01"
+end: "2026-06-01"
+base_qty: 400
+min_turnover: 1000000      # 日均成交额下限(本币)
+min_atr_pct: 0.005         # 日内振幅下限 0.5%
+top: 3
+candidates:
+  - { futu: "HK.00700", market: "HK" }
+  - { futu: "HK.09988", market: "HK" }
+  - { futu: "US.AAPL",  market: "US" }
