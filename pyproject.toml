@@ -8,6 +8,7 @@ dependencies = [
   "pandas>=2.0",
   "pyarrow>=14.0",
   "pyyaml>=6.0",
+  "ib-insync>=0.9.86",
 ]
 
 [project.optional-dependencies]
