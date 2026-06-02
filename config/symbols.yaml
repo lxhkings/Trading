@@ -5,3 +5,9 @@ symbols:
     ib_exchange: SEHK
     ib_currency: HKD
     market: HK
+  - internal: US.AAPL
+    futu: US.AAPL
+    ib_symbol: AAPL
+    ib_exchange: SMART
+    ib_currency: USD
+    market: US

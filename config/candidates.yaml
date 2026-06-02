@@ -3,7 +3,7 @@ start: "2024-06-01"
 end: "2026-06-01"
 base_qty: 400
 min_turnover: 1000000      # 日均成交额下限(本币)
-min_atr_pct: 0.005         # 日内振幅下限 0.5%
+min_atr_pct: 0.001         # 日内振幅下限 0.1% (放宽)
 top: 3
 candidates:
   - { futu: "HK.00700", market: "HK" }

@@ -1,0 +1,25 @@
+symbols:
+- symbol: HK.09988
+  market: HK
+  sharpe: -0.003
+  t_return: -0.1843
+  params:
+    bb_period: 20
+    bb_k: 2.0
+    rsi_period: 14
+    rsi_low: 30.0
+    rsi_high: 70.0
+    ema_fast: 9
+    ema_slow: 21
+- symbol: US.AAPL
+  market: US
+  sharpe: -0.0066
+  t_return: -0.1873
+  params:
+    bb_period: 20
+    bb_k: 2.0
+    rsi_period: 14
+    rsi_low: 30.0
+    rsi_high: 70.0
+    ema_fast: 9
+    ema_slow: 21
